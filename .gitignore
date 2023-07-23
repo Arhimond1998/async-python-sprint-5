@@ -1,4 +1,5 @@
-
+.env.config
 .idea/
 __pycache__/
 *.pyc
+download/

@@ -1,0 +1,52 @@
+version: "3"
+
+
+services:
+  file_app:
+    image: file_app
+    build: .
+    volumes:
+      - .:/opt/app
+    ports:
+      - "${APP_PUBLIC_PORT:-9801}:${APP_PORT:-8000}"
+    depends_on:
+      - pg_file_app
+      - redis
+    command: >
+      bash -c "python3 start.py"
+    env_file:
+      - .env.config
+
+  pg_file_app:
+    container_name: pg_file_app
+    image: postgres
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    restart: always
+    ports:
+      - "5432:5432"
+    env_file:
+      - .env.config
+
+  nginx:
+    image: nginx
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./download:/opt/app/download
+    ports:
+      - "${HOST_PORT:-8080}:80"
+    depends_on:
+      - file_app
+    environment:
+      - NGINX_PORT=80
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1
+    volumes:
+      - ./docker/redis_cache:/data
