@@ -7,7 +7,7 @@ from sqlalchemy import text
 
 from src.api.v1.file import router as file_router
 from src.api.v1.user import router as user_router
-from src.core.deps.user import login_required
+from src.core.deps import login_required
 from src.db.session import get_session
 from src.services.redis import redis_client
 

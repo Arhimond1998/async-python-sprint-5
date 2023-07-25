@@ -7,5 +7,3 @@ redis_client = StrictRedis(
     db=settings.REDIS_DB,
     password=settings.REDIS_PASSWORD
 )
-
-

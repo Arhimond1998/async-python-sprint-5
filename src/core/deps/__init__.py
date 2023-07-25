@@ -1,1 +1,1 @@
-from src.core.deps.user import login_required
+from src.core.deps.user import login_required # noqa
