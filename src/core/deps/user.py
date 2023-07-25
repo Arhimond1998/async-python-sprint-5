@@ -6,12 +6,12 @@ from src.core.config import settings
 from starlette.exceptions import HTTPException
 from starlette.status import HTTP_401_UNAUTHORIZED
 from jose import jwt, JWTError
-from src.schemas.user import UserBase
+from src.schemas.user import UserAuth
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/user/auth")
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserBase:
+async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserAuth:
     credentials_exception = HTTPException(
         status_code=HTTP_401_UNAUTHORIZED,
         detail="Authorization required",
@@ -20,18 +20,19 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserBase:
     try:
         payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
         username: str = payload.get("username")
-        if username is None:
+        id_user: str = payload.get("id")
+        if username is None or id_user is None:
             raise credentials_exception
     except JWTError as e:
         logging.critical(str(e))
         raise credentials_exception
 
-    return UserBase(username=username)
+    return UserAuth(username=username, id_user=id_user)
 
 
-async def user_required(current_user: UserBase = Depends(get_current_user)) -> UserBase:
+async def user_required(current_user: UserAuth = Depends(get_current_user)) -> UserAuth:
     return current_user
 
 
-async def login_required(user: UserBase = Depends(get_current_user)) -> bool:
+async def login_required(user: UserAuth = Depends(get_current_user)) -> bool:
     return True
