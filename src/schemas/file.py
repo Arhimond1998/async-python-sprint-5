@@ -9,6 +9,7 @@ class FileBase(BaseModel):
 
 
 class FileCreate(FileBase):
+    id_user: UUID
     path: str
     size: int
 
