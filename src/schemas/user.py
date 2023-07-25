@@ -12,8 +12,12 @@ class UserCreate(UserBase):
     password: str
 
 
-class UserAuth(UserCreate):
+class UserLogin(UserCreate):
     pass
+
+
+class UserAuth(UserBase):
+    id_user: UUID
 
 
 class UserUpdate(UserCreate):
