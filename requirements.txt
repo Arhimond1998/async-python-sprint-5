@@ -1,9 +1,12 @@
 fastapi==0.98.0
 pydantic==1.10.9
 uvicorn==0.22.0
+gunicorn==21.2.0
 uvloop==0.17.0
 orjson==3.9.1
 python-dotenv==1.0.0
+
+flake8==6.0.0
 
 sqlalchemy==2.0.17
 psycopg2-binary==2.9.6
@@ -19,3 +22,5 @@ alembic==1.11.1
 
 python-multipart==0.0.6
 redis==4.6.0
+
+aiofiles==23.1.0
