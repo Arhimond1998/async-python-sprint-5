@@ -21,6 +21,9 @@ class AsyncPostgresDsn(PostgresDsn):
 class Settings(BaseSettings):
     PROJECT_NAME: str = 'FileApp'
     UPLOAD_FOLDER: str = 'download'
+    TEST_UPLOAD_FOLDER: str = 'test_download'
+
+    MAX_FILE_SIZE: int = 10 * 1024 * 1024
 
     APP_HOST: str = '0.0.0.0'
     APP_PORT: int = 8080
