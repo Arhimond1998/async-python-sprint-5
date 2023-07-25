@@ -3,6 +3,7 @@ version: "3"
 
 services:
   file_app:
+    container_name: file_app
     image: file_app
     build: .
     volumes:
@@ -13,7 +14,8 @@ services:
       - pg_file_app
       - redis
     command: >
-      bash -c "python3 start.py"
+      python -m gunicorn --name file_service -k uvicorn.workers.UvicornWorker -w 1 -b 0.0.0.0:8000 src.main:app
+
     env_file:
       - .env.config
 
