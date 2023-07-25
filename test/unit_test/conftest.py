@@ -21,8 +21,7 @@ def event_loop(request):
 async def app_instance() -> FastAPI:
     from src.main import app
     from src.db.db import Base
-    from src.models.file import FileTable
-    from src.models.user import UserTable
+    from src.models import FileTable, UserTable # noqa
     from src.db.session import get_session
 
     meta = Base.metadata
@@ -30,7 +29,7 @@ async def app_instance() -> FastAPI:
     async with test_engine.begin() as conn:
         await conn.run_sync(meta.drop_all)
         await conn.run_sync(meta.create_all)
-
+    settings.UPLOAD_FOLDER = settings.TEST_UPLOAD_FOLDER
     app.dependency_overrides[get_session] = get_test_db
     return app
 
