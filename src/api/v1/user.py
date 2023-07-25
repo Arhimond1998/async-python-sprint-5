@@ -8,10 +8,10 @@ from starlette.exceptions import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.config import settings
-from src.schemas.user import UserCreate, User, UserAuth
+from src.schemas.user import UserCreate, User, UserLogin
 from src.services.repository.repository_user import user_rep
 from src.db.session import get_session
-from src.models.user import UserTable
+from src.models import UserTable
 
 
 router = APIRouter(prefix='/user')
@@ -32,7 +32,7 @@ async def register_user(
 
 @router.post('/auth', status_code=HTTP_201_CREATED)
 async def auth_user(
-        data: UserAuth,
+        data: UserLogin,
         db: AsyncSession = Depends(get_session),
 ) -> str:
     logging.info('User auth %s', data.username)
