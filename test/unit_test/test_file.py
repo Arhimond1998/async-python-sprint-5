@@ -1,7 +1,20 @@
+from pathlib import Path
+
 from fastapi import FastAPI
 from httpx import AsyncClient
 from starlette.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_401_UNAUTHORIZED
 import pytest
+
+
+@pytest.fixture(scope='session')
+def test_file_path() -> str:
+    filename = 'test.txt'
+
+    with open(filename, 'w') as f:
+        f.write('abracadabra')
+
+    p = Path().cwd() / filename
+    return str(p)
 
 
 @pytest.fixture(scope='session')
@@ -24,8 +37,8 @@ async def user_token(app_instance: FastAPI, client: AsyncClient) -> str:
     return auth_r.json()
 
 
-async def test_upload_file(app_instance: FastAPI, client: AsyncClient, user_token: str):
-    with open('test.txt', 'rb') as f:
+async def test_upload_file(app_instance: FastAPI, client: AsyncClient, user_token: str, test_file_path: str):
+    with open(test_file_path, 'rb') as f:
         response = await client.post(
             app_instance.url_path_for('upload_file') + '?path=test/',
             files={'file': f},
@@ -37,12 +50,17 @@ async def test_upload_file(app_instance: FastAPI, client: AsyncClient, user_toke
     assert resp_json['id_file']
     assert resp_json['is_downloadable'] is True
     assert resp_json['name'] == 'test.txt'
-    assert resp_json['path'] == 'download/test/test.txt'
+    assert resp_json['path'] == 'test/test.txt'
     assert resp_json['size'] == 11
 
 
-async def test_upload_file_by_fullpath(app_instance: FastAPI, client: AsyncClient, user_token: str):
-    with open('test.txt', 'rb') as f:
+async def test_upload_file_by_fullpath(
+        app_instance: FastAPI,
+        client: AsyncClient,
+        user_token: str,
+        test_file_path: str
+):
+    with open(test_file_path, 'rb') as f:
         response = await client.post(
             app_instance.url_path_for('upload_file') + '?path=test/123.txt',
             files={'file': f},
@@ -54,12 +72,12 @@ async def test_upload_file_by_fullpath(app_instance: FastAPI, client: AsyncClien
     assert resp_json['id_file']
     assert resp_json['is_downloadable'] is True
     assert resp_json['name'] == '123.txt'
-    assert resp_json['path'] == 'download/test/123.txt'
+    assert resp_json['path'] == 'test/123.txt'
     assert resp_json['size'] == 11
 
 
-async def test_get_files_info(app_instance: FastAPI, client: AsyncClient, user_token: str):
-    with open('test.txt', 'rb') as f:
+async def test_get_files_info(app_instance: FastAPI, client: AsyncClient, user_token: str, test_file_path: str):
+    with open(test_file_path, 'rb') as f:
         await client.post(
             app_instance.url_path_for('upload_file') + '?path=test/get_file.txt',
             files={'file': f},
@@ -77,8 +95,8 @@ async def test_get_files_info(app_instance: FastAPI, client: AsyncClient, user_t
     assert response.status_code == HTTP_200_OK
 
 
-async def test_get_files_info_exc(app_instance: FastAPI, client: AsyncClient, user_token: str):
-    with open('test.txt', 'rb') as f:
+async def test_get_files_info_exc(app_instance: FastAPI, client: AsyncClient, user_token: str, test_file_path: str):
+    with open(test_file_path, 'rb') as f:
         await client.post(
             app_instance.url_path_for('upload_file') + '?path=test/get_file_exc.txt',
             files={'file': f},
